@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  variant?: "danger" | "warning";
+  variant?: "danger" | "primary";
 }
 
 export default function ConfirmDialog({
