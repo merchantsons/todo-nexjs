@@ -1,0 +1,285 @@
+# SpecKit Plus Configuration for Hackathon II: Evolution of Todo
+# Version: 1.0.0
+# Last Updated: 2026-01-02
+
+project:
+  name: "Evolution of Todo"
+  slug: "hackathon-todo"
+  description: "Transform Phase I console app into a secure, multi-user, persistent web application"
+  hackathon: "Hackathon II"
+  repository: "todo-nexjs"
+  
+phase:
+  current: "Phase II"
+  name: "Full-Stack Web Application"
+  start_date: "2026-01-02"
+  objective: "Build a production-ready, secure, multi-user todo web application with JWT authentication and persistent storage"
+  
+  allowed_features:
+    - "User Registration and Login"
+    - "JWT-based Authentication"
+    - "Task CRUD Operations (Create, Read, Update, Delete)"
+    - "Mark Task as Complete"
+    - "User-scoped Data Isolation"
+    - "Responsive Web UI"
+    - "RESTful API Backend"
+    - "Database Persistence (PostgreSQL)"
+    - "Client-side State Management"
+    - "Form Validation"
+    - "Loading and Error States"
+    
+  forbidden_features:
+    - "Real-time Collaboration"
+    - "WebSocket Connections"
+    - "Server-Sent Events (SSE)"
+    - "Shared Todo Lists Between Users"
+    - "Live Presence Indicators"
+    - "Operational Transformations"
+    - "Conflict Resolution"
+    - "AI Chatbot Integration"
+    - "MCP (Model Context Protocol) Servers"
+    - "Kafka Message Streaming"
+    - "Kubernetes Orchestration"
+    - "AI Agents Runtime"
+    - "OAuth Third-party Authentication"
+    - "Refresh Token Logic"
+    - "Role-Based Access Control (RBAC)"
+    - "Real-time Notifications"
+    
+  readiness_criteria:
+    - "Multiple users can register and login independently"
+    - "Each user sees only their own tasks"
+    - "All tasks persist in PostgreSQL database"
+    - "JWT authentication enforced on all protected endpoints"
+    - "User isolation enforced at query level"
+    - "Responsive UI functional in modern browsers"
+    - "Manual testing passes for all user workflows"
+    - "Application deployable on Vercel (frontend)"
+    - "Backend stateless and horizontally scalable"
+    - "Architecture ready for Phase III AI integration"
+
+technology_stack:
+  frontend:
+    framework: "Next.js 16+"
+    router: "App Router"
+    language: "TypeScript"
+    styling: "Tailwind CSS"
+    authentication: "Better Auth"
+    auth_mode: "JWT-enabled"
+    state_management: "React Hooks"
+    deployment: "Vercel"
+    
+  backend:
+    framework: "FastAPI"
+    language: "Python 3.13+"
+    orm: "SQLModel"
+    authentication: "JWT Verification"
+    validation: "Pydantic"
+    deployment: "Vercel Serverless Functions or standalone"
+    
+  database:
+    provider: "Neon Serverless PostgreSQL"
+    connection: "DATABASE_URL environment variable"
+    schema_management: "SQLModel"
+    
+  authentication:
+    strategy: "Stateless JWT"
+    frontend_library: "Better Auth"
+    backend_verification: "JWT signature validation"
+    shared_secret: "BETTER_AUTH_SECRET"
+    token_transmission: "Authorization: Bearer <token>"
+    
+security:
+  authentication_mode: "Stateless JWT (mandatory)"
+  session_storage: "Prohibited"
+  user_isolation: "Query-level enforcement"
+  password_hashing: "bcrypt (minimum)"
+  secrets_management: "Environment variables only"
+  cors_policy: "Frontend origin only"
+  
+  rules:
+    - "All API endpoints require JWT authentication"
+    - "JWT user_id must match path {user_id} parameter"
+    - "Database queries must filter by authenticated user_id"
+    - "Return 404 for unauthorized resource access (not 403)"
+    - "Never trust client-provided user identifiers"
+    - "No hardcoded secrets or credentials"
+    - "Prevent SQL injection, XSS, and CSRF"
+    - "Never log sensitive data (passwords, tokens)"
+    
+architecture:
+  style: "Monorepo with separated frontend and backend"
+  api_design: "RESTful"
+  state: "Stateless backend, stateful frontend (client-side)"
+  data_flow: "Frontend → JWT → Backend → Database"
+  
+  structure: |
+    hackathon-todo/
+    ├── .spec-kit/
+    │   └── config.yaml
+    ├── .specify/
+    │   └── memory/
+    │       └── constitution.md
+    ├── .claude/
+    │   ├── agents/
+    │   └── skills/
+    ├── specs/
+    │   ├── overview.md
+    │   ├── architecture.md
+    │   ├── features/
+    │   ├── api/
+    │   ├── database/
+    │   └── ui/
+    ├── frontend/
+    ├── backend/
+    ├── history/
+    │   ├── prompts/
+    │   └── adr/
+    └── README.md
+
+api_contract:
+  base_path: "/api"
+  authentication: "Required on all endpoints"
+  
+  endpoints:
+    - method: "GET"
+      path: "/api/{user_id}/tasks"
+      description: "List all tasks for authenticated user"
+      
+    - method: "POST"
+      path: "/api/{user_id}/tasks"
+      description: "Create a new task"
+      
+    - method: "GET"
+      path: "/api/{user_id}/tasks/{id}"
+      description: "Get a specific task"
+      
+    - method: "PUT"
+      path: "/api/{user_id}/tasks/{id}"
+      description: "Update a task"
+      
+    - method: "DELETE"
+      path: "/api/{user_id}/tasks/{id}"
+      description: "Delete a task"
+      
+    - method: "PATCH"
+      path: "/api/{user_id}/tasks/{id}/complete"
+      description: "Toggle task completion status"
+
+database_schema:
+  tables:
+    - name: "tasks"
+      description: "User-owned todo tasks"
+      fields:
+        - name: "id"
+          type: "Integer"
+          constraints: "Primary Key, Auto-increment"
+          
+        - name: "user_id"
+          type: "String"
+          constraints: "Required, Indexed, Foreign Key to Better Auth users"
+          
+        - name: "title"
+          type: "String"
+          constraints: "Required, Max 255 characters"
+          
+        - name: "description"
+          type: "Text"
+          constraints: "Nullable"
+          
+        - name: "completed"
+          type: "Boolean"
+          constraints: "Default false"
+          
+        - name: "created_at"
+          type: "Timestamp"
+          constraints: "Auto-populated on creation"
+          
+        - name: "updated_at"
+          type: "Timestamp"
+          constraints: "Auto-updated on modification"
+
+governance:
+  framework: "SpecKitPlus Constitution"
+  constitution_path: ".specify/memory/constitution.md"
+  development_style: "Spec-Driven Development (SDD)"
+  
+  agents:
+    - name: "Hackathon Architect"
+      role: "Primary orchestrator and implementation coordinator"
+      authority: "Full-stack coordination, spec validation"
+      
+    - name: "Backend Specialist Phase II"
+      role: "FastAPI backend implementation"
+      authority: "API endpoints, database, JWT verification"
+      
+    - name: "Frontend Specialist Phase II"
+      role: "Next.js frontend implementation"
+      authority: "UI components, Better Auth, API client"
+      
+    - name: "Auth Security Agent"
+      role: "Security enforcement and authentication"
+      authority: "JWT validation, user isolation, security reviews"
+      
+  skills:
+    - name: "Secure JWT Guard"
+      purpose: "Standardized JWT validation"
+      phases: ["II", "III", "IV", "V"]
+      
+    - name: "User-Scoped Query"
+      purpose: "Automatic user isolation in queries"
+      phases: ["II", "III", "IV", "V"]
+      
+    - name: "Frontend Auth API Client"
+      purpose: "Centralized API access with JWT attachment"
+      phases: ["II", "III", "IV", "V"]
+
+documentation:
+  prompt_history: "history/prompts/"
+  architecture_decisions: "history/adr/"
+  specifications: "specs/"
+  
+  phr_routing:
+    constitution: "history/prompts/constitution/"
+    features: "history/prompts/<feature-name>/"
+    general: "history/prompts/general/"
+    
+quality_gates:
+  specifications:
+    - "All features must have complete specifications"
+    - "Specs must define acceptance criteria"
+    - "Security requirements must be explicit"
+    - "API contracts must be fully documented"
+    
+  implementation:
+    - "All code generated from approved specifications"
+    - "JWT authentication enforced on all endpoints"
+    - "User isolation verified at query level"
+    - "No hardcoded secrets or credentials"
+    - "Smallest viable diff preferred"
+    
+  validation:
+    - "Manual testing of all user workflows"
+    - "Security review of authentication flow"
+    - "Cross-user access attempts must fail"
+    - "Database queries filtered by user_id"
+
+success_metrics:
+  technical:
+    - "Zero authentication bypasses"
+    - "Zero cross-user data leaks"
+    - "100% JWT enforcement coverage"
+    - "Stateless backend verified"
+    
+  functional:
+    - "All 5 core task operations functional"
+    - "Multi-user registration and login working"
+    - "Data persistence confirmed"
+    - "Responsive UI on desktop and mobile"
+    
+  process:
+    - "All implementations spec-driven"
+    - "PHRs created for all major activities"
+    - "Constitutional compliance maintained"
+    - "Agent boundaries respected"
+
