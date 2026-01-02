@@ -25,10 +25,12 @@
 5. Click **"Deploy"**
 6. After deployment, go to **Settings → Environment Variables** and add:
    ```
-   DATABASE_URL=postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-   BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+   DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require&channel_binding=require
+   BETTER_AUTH_SECRET=your-secret-key-here
    CORS_ORIGINS=https://your-frontend-url.vercel.app
    ```
+   ⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
+   ⚠️ **Generate a secure random string for BETTER_AUTH_SECRET (e.g., using `openssl rand -base64 32`)**
 7. **Redeploy** after adding environment variables
 
 #### Deploy Frontend
@@ -45,9 +47,10 @@
 6. After deployment, go to **Settings → Environment Variables** and add:
    ```
    NEXT_PUBLIC_API_URL=https://your-backend-url.vercel.app
-   BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+   BETTER_AUTH_SECRET=your-secret-key-here
    BETTER_AUTH_URL=https://your-frontend-url.vercel.app
    ```
+   ⚠️ **Use the same BETTER_AUTH_SECRET as the backend**
 7. **Update Backend CORS**: Go to backend project → Settings → Environment Variables → Update `CORS_ORIGINS` with frontend URL
 8. **Redeploy both** frontend and backend
 
@@ -102,10 +105,12 @@ After deployment, add environment variables in Vercel Dashboard.
 Add in Vercel Dashboard → Backend Project → Settings → Environment Variables:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require&channel_binding=require
+BETTER_AUTH_SECRET=your-secret-key-here
 CORS_ORIGINS=https://your-frontend-url.vercel.app
 ```
+⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
+⚠️ **Generate a secure random string for BETTER_AUTH_SECRET (e.g., using `openssl rand -base64 32`)**
 
 ### Frontend Environment Variables
 
@@ -113,7 +118,7 @@ Add in Vercel Dashboard → Frontend Project → Settings → Environment Variab
 
 ```
 NEXT_PUBLIC_API_URL=https://your-backend-url.vercel.app
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+BETTER_AUTH_SECRET=your-secret-key-here
 BETTER_AUTH_URL=https://your-frontend-url.vercel.app
 ```
 

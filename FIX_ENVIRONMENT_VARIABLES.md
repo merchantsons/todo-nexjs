@@ -23,12 +23,14 @@ Go to: **https://vercel.com/merchantsons-projects/backend/settings/environment-v
 
 **Variable 1:**
 - Key: `DATABASE_URL`
-- Value: `postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+- Value: `postgresql://username:password@host:port/database?sslmode=require&channel_binding=require`
+  - ⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
 - Environment: **Production**
 
 **Variable 2:**
 - Key: `BETTER_AUTH_SECRET`
-- Value: `WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k`
+- Value: `your-secret-key-here`
+  - ⚠️ **Generate a secure random string (e.g., using `openssl rand -base64 32`)**
 - Environment: **Production**
 
 **Variable 3:**
@@ -43,7 +45,7 @@ Go to: **https://vercel.com/merchantsons-projects/frontend/settings/environment-
 Verify these 3 variables exist for **Production**:
 
 - `NEXT_PUBLIC_API_URL` = `https://backend-nine-sigma-81.vercel.app`
-- `BETTER_AUTH_SECRET` = `WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k`
+- `BETTER_AUTH_SECRET` = `your-secret-key-here` (same as backend)
 - `BETTER_AUTH_URL` = `https://frontend-xi-henna.vercel.app`
 
 If any are missing or wrong, remove and re-add them.

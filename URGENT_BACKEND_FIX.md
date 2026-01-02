@@ -16,13 +16,15 @@ Click **"Add New"** and add these **3 variables** one by one:
 
 #### Variable 1: DATABASE_URL
 - **Key**: `DATABASE_URL`
-- **Value**: `postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+- **Value**: `postgresql://username:password@host:port/database?sslmode=require&channel_binding=require`
+  - ⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
 - **Environment**: Select **Production** ✅
 - Click **Save**
 
 #### Variable 2: BETTER_AUTH_SECRET
 - **Key**: `BETTER_AUTH_SECRET`
-- **Value**: `WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k`
+- **Value**: `your-secret-key-here`
+  - ⚠️ **Generate a secure random string (e.g., using `openssl rand -base64 32`)**
 - **Environment**: Select **Production** ✅
 - Click **Save**
 

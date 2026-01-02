@@ -13,12 +13,14 @@ The backend is failing because environment variables need to be verified and set
 3. **Add these variables** for **Production** environment:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require&channel_binding=require
 ```
+⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
 
 ```
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+BETTER_AUTH_SECRET=your-secret-key-here
 ```
+⚠️ **Generate a secure random string (e.g., using `openssl rand -base64 32`)**
 
 ```
 CORS_ORIGINS=https://frontend-xi-henna.vercel.app
@@ -37,8 +39,9 @@ NEXT_PUBLIC_API_URL=https://backend-nine-sigma-81.vercel.app
 ```
 
 ```
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+BETTER_AUTH_SECRET=your-secret-key-here
 ```
+⚠️ **Use the same secret as the backend**
 
 ```
 BETTER_AUTH_URL=https://frontend-xi-henna.vercel.app

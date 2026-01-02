@@ -23,10 +23,12 @@ Go to: https://vercel.com/merchantsons-projects/backend/settings/environment-var
 Add these variables for **Production** environment:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require&channel_binding=require
+BETTER_AUTH_SECRET=your-secret-key-here
 CORS_ORIGINS=https://frontend-xi-henna.vercel.app
 ```
+⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
+⚠️ **Generate a secure random string for BETTER_AUTH_SECRET (e.g., using `openssl rand -base64 32`)**
 
 ### Frontend Environment Variables
 
@@ -36,7 +38,7 @@ Add these variables for **Production** environment:
 
 ```
 NEXT_PUBLIC_API_URL=https://backend-nine-sigma-81.vercel.app
-BETTER_AUTH_SECRET=WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k
+BETTER_AUTH_SECRET=your-secret-key-here
 BETTER_AUTH_URL=https://frontend-xi-henna.vercel.app
 ```
 

@@ -37,8 +37,10 @@ The backend also needs to be working. Check:
 If the backend is also failing, you need to set backend environment variables in the Vercel Dashboard:
 - Go to: https://vercel.com/merchantsons-projects/backend/settings/environment-variables
 - Set these 3 variables for Production:
-  - `DATABASE_URL` = `postgresql://neondb_owner:npg_znGThYpK6to5@ep-late-sound-a4fa169w-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
-  - `BETTER_AUTH_SECRET` = `WtxT_SqMLumf85IExMVyDV3jKYgaJCWC-gHdcKECn-k`
+  - `DATABASE_URL` = `postgresql://username:password@host:port/database?sslmode=require&channel_binding=require`
+    - ⚠️ **Use your actual Neon PostgreSQL connection string from your Neon dashboard**
+  - `BETTER_AUTH_SECRET` = `your-secret-key-here`
+    - ⚠️ **Generate a secure random string (e.g., using `openssl rand -base64 32`)**
   - `CORS_ORIGINS` = `https://frontend-xi-henna.vercel.app`
 - Redeploy backend after setting variables
 
