@@ -18,9 +18,6 @@ const lavishlyYours = Lavishly_Yours({
 export const metadata: Metadata = {
   title: "Evolution of Todo",
   description: "Your personal task management solution",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
