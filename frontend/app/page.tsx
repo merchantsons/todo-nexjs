@@ -44,21 +44,21 @@ export default function LandingPage() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8 mt-1 sm:mt-3 md:mt-4 lg:mt-6 flex-shrink-0 pb-2 sm:pb-4">
-          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-6 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
-            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">✓</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 mt-1 sm:mt-3 md:mt-4 lg:mt-5 flex-shrink-0 pb-2 sm:pb-4">
+          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-3">✓</div>
             <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1 sm:mb-1.5 md:mb-2 text-gray-900">Secure</h3>
             <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-600">Your data protected with JWT authentication</p>
           </div>
           
-          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-6 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
-            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">✨</div>
+          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-3">✨</div>
             <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1 sm:mb-1.5 md:mb-2 text-gray-900">Simple</h3>
             <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-600">Clean UI easy to use</p>
           </div>
           
-          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-6 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
-            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">🔒</div>
+          <div className="bg-white rounded-lg p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-lg border border-green-100 hover:shadow-xl transition-shadow">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-1.5 sm:mb-2 md:mb-3 lg:mb-3">🔒</div>
             <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1 sm:mb-1.5 md:mb-2 text-gray-900">Private</h3>
             <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-600">Your tasks only yours</p>
           </div>
