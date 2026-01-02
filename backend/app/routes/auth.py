@@ -4,9 +4,13 @@ from pydantic import BaseModel, EmailStr
 from jose import jwt
 from datetime import datetime, timedelta
 import bcrypt
+import os
 from app.models import User
 from app.dependencies.database import get_db_session
-from app.config import settings
+
+# Read secret directly from environment (Vercel provides this)
+def get_auth_secret():
+    return os.getenv("BETTER_AUTH_SECRET", "")
 
 router = APIRouter()
 
@@ -28,13 +32,16 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def create_jwt(user_id: int, email: str) -> str:
     """Create JWT token with user_id and email claims"""
+    secret = get_auth_secret()
+    if not secret:
+        raise ValueError("BETTER_AUTH_SECRET not configured")
     payload = {
         "user_id": user_id,
         "email": email,
         "iat": datetime.utcnow(),
         "exp": datetime.utcnow() + timedelta(hours=24)
     }
-    return jwt.encode(payload, settings.better_auth_secret, algorithm="HS256")
+    return jwt.encode(payload, secret, algorithm="HS256")
 
 @router.post("/api/auth/register", status_code=201)
 async def register(

@@ -1,6 +1,17 @@
-from mangum import Mangum
-from app.main import app
+"""
+Ultra-simple handler to test if Vercel Python works at all
+Vercel Python functions should export a 'handler' function
+"""
+import json
 
-# Vercel serverless function wrapper for FastAPI
-# Mangum converts ASGI app to AWS Lambda format (which Vercel uses)
-handler = Mangum(app, lifespan="off")
+def handler(request):
+    """
+    Vercel Python handler
+    request is a Request object from Vercel
+    """
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps({"message": "Handler works!", "status": "ok"})
+    }
+

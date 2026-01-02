@@ -32,7 +32,7 @@ export default function Textarea({
   
   const textareaId = `textarea-${label.toLowerCase().replace(/\s+/g, '-')}`;
   
-  const baseStyles = "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors resize-vertical";
+  const baseStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 transition-colors resize-vertical";
   const normalStyles = "border-gray-300 focus:ring-blue-500 focus:border-blue-500";
   const errorStyles = "border-red-500 focus:ring-red-500 focus:border-red-500";
   const textareaStyles = error ? errorStyles : normalStyles;
@@ -43,8 +43,8 @@ export default function Textarea({
         htmlFor={textareaId}
         className={`block mb-2 transition-all duration-200 ${
           showLabel
-            ? "text-sm text-gray-600"
-            : "text-base text-gray-500"
+            ? "text-xs sm:text-sm text-gray-600"
+            : "text-sm sm:text-base text-gray-500"
         }`}
       >
         {label} {required && <span className="text-red-500">*</span>}
@@ -70,9 +70,10 @@ export default function Textarea({
       )}
       
       {error && (
-        <div className="text-sm text-red-600 mt-1">{error}</div>
+        <div className="text-xs sm:text-sm text-red-600 mt-1">{error}</div>
       )}
     </div>
   );
 }
+
 

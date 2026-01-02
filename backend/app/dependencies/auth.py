@@ -1,7 +1,11 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
-from app.config import settings
+import os
+
+# Read secret directly from environment (Vercel provides this)
+def get_auth_secret():
+    return os.getenv("BETTER_AUTH_SECRET") or ""
 
 security = HTTPBearer()
 
@@ -10,11 +14,18 @@ def get_current_user_id(
 ) -> int:
     """Validates JWT and extracts user_id. Skills: secure-jwt-guard.md"""
     token = credentials.credentials
+    secret = get_auth_secret()
+    
+    if not secret:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server configuration error: BETTER_AUTH_SECRET not set"
+        )
     
     try:
         payload = jwt.decode(
             token, 
-            settings.better_auth_secret, 
+            secret, 
             algorithms=["HS256"]
         )
         user_id: int = payload.get("user_id")

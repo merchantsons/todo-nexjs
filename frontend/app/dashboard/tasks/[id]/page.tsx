@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import TaskForm from '@/components/tasks/TaskForm';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
@@ -75,27 +76,27 @@ export default function TaskDetailsPage() {
   
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-white">
         <Header />
-        <main className="max-w-3xl mx-auto p-8">
+        <main className="flex-1 max-w-3xl mx-auto p-4 sm:p-6 md:p-8 w-full">
           <Button
             variant="secondary"
             onClick={() => router.push("/dashboard")}
-            className="mb-6"
+            className="mb-4 sm:mb-6 w-full sm:w-auto text-sm sm:text-base"
           >
             ← Back to Dashboard
           </Button>
           
-          <h1 className="text-3xl font-bold mb-6">Task Details</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 gradient-green bg-clip-text text-transparent">Task Details</h1>
           
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center py-8 sm:py-12">
               <LoadingSpinner size="lg" />
             </div>
           ) : error ? (
             <ErrorMessage message={error} />
           ) : task ? (
-            <div className="bg-white rounded-lg p-6 shadow">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-lg border border-green-100">
               <TaskForm
                 task={task}
                 onSubmit={handleUpdate}
@@ -103,16 +104,18 @@ export default function TaskDetailsPage() {
                 submitLabel="Save Changes"
               />
               
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <Button variant="danger" onClick={handleDelete}>
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-green-200">
+                <Button variant="danger" onClick={handleDelete} className="w-full sm:w-auto">
                   Delete Task
                 </Button>
               </div>
             </div>
           ) : null}
         </main>
+        <Footer />
       </div>
     </ProtectedRoute>
   );
 }
+
 

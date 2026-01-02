@@ -59,8 +59,8 @@ export default function RegisterForm({ onSubmit, error }: RegisterFormProps) {
   };
   
   return (
-    <div className="w-full max-w-md mx-auto p-8 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold text-center mb-6">Create your account</h1>
+    <div className="w-full max-w-md mx-auto p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-lg border border-green-100">
+      <h1 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 gradient-green bg-clip-text text-white">Create your account</h1>
       
       {(error || formError) && (
         <ErrorMessage
@@ -89,8 +89,8 @@ export default function RegisterForm({ onSubmit, error }: RegisterFormProps) {
             required
           />
           {passwordErrors.length > 0 && (
-            <div className="mt-2 text-sm text-red-600">
-              <ul className="list-disc list-inside">
+            <div className="mt-2 text-xs sm:text-sm text-red-600">
+              <ul className="list-disc list-inside space-y-1">
                 {passwordErrors.map((err, i) => (
                   <li key={i}>{err}</li>
                 ))}
@@ -109,9 +109,9 @@ export default function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         </Button>
       </form>
       
-      <p className="mt-4 text-center text-sm text-gray-600">
+      <p className="mt-4 text-center text-xs sm:text-sm text-gray-600 px-2">
         Already have an account?{" "}
-        <a href="/login" className="text-blue-600 hover:underline">
+        <a href="/login" className="text-green-700 hover:text-green-800 font-medium transition-colors">
           Log in →
         </a>
       </p>

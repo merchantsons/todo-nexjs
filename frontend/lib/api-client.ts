@@ -10,7 +10,11 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     throw new Error("Unauthenticated");
   }
   
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = 
+    process.env.NEXT_PUBLIC_API_URL || 
+    (typeof window !== "undefined" && window.location.hostname !== "localhost" 
+      ? "https://backend-nine-sigma-81.vercel.app" 
+      : "http://localhost:8000");
   
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,

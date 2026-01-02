@@ -96,15 +96,16 @@ export default function TaskForm({
         />
       )}
       
-      <div className="flex gap-3">
-        <Button type="submit" variant="primary" disabled={loading}>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button type="submit" variant="primary" disabled={loading} className="w-full sm:w-auto">
           {loading ? "Saving..." : submitLabel}
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel}>
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto">
           Cancel
         </Button>
       </div>
     </form>
   );
 }
+
 

@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins, Lavishly_Yours } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+});
+
+const lavishlyYours = Lavishly_Yours({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-lavishly-yours",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} ${lavishlyYours.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}
         </AuthProvider>

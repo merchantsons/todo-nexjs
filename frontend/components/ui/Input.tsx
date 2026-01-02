@@ -35,7 +35,7 @@ export default function Input({
   
   const inputId = `input-${label.toLowerCase().replace(/\s+/g, '-')}`;
   
-  const baseInputStyles = "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors";
+  const baseInputStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 transition-colors";
   const normalStyles = "border-gray-300 focus:ring-blue-500 focus:border-blue-500";
   const errorStyles = "border-red-500 focus:ring-red-500 focus:border-red-500";
   const inputStyles = error ? errorStyles : normalStyles;
@@ -44,10 +44,10 @@ export default function Input({
     <div className={`relative ${className}`}>
       <label
         htmlFor={inputId}
-        className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+        className={`absolute left-3 sm:left-4 transition-all duration-200 pointer-events-none ${
           showLabel
             ? "top-2 text-xs text-gray-600"
-            : "top-3 text-base text-gray-500"
+            : "top-2.5 sm:top-3 text-sm sm:text-base text-gray-500"
         }`}
       >
         {label} {required && <span className="text-red-500">*</span>}
@@ -65,14 +65,14 @@ export default function Input({
           disabled={disabled}
           maxLength={maxLength}
           required={required}
-          className={`${baseInputStyles} ${inputStyles} ${hasValue || focused ? "pt-6 pb-2" : "pt-3 pb-2"} ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          className={`${baseInputStyles} ${inputStyles} ${hasValue || focused ? "pt-5 sm:pt-6 pb-2" : "pt-2.5 sm:pt-3 pb-2"} ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
         />
         
         {type === "password" && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
           >
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
@@ -86,9 +86,10 @@ export default function Input({
       )}
       
       {error && (
-        <div className="text-sm text-red-600 mt-1">{error}</div>
+        <div className="text-xs sm:text-sm text-red-600 mt-1">{error}</div>
       )}
     </div>
   );
 }
+
 
