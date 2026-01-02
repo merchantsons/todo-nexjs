@@ -56,6 +56,13 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-green-700 mt-2 sm:mt-2.5 md:mt-3 pt-2 sm:pt-2.5 md:pt-3 text-center text-[9px] sm:text-xs md:text-sm text-green-100 px-2 sm:px-4">
+          <div className="flex justify-center mb-2 sm:mb-3">
+            <img 
+              src="/logo.png" 
+              alt="Evolution of Todo Logo" 
+              className="h-8 w-auto sm:h-10 md:h-12 lg:h-14"
+            />
+          </div>
           <p className="mb-0.5 sm:mb-1">© {currentYear} Evolution of Todo. All rights reserved.</p>
           <p className="break-words">Developed by: Merchantsons For GIAIC Hackathon 2 - Roll # 00037391</p>
         </div>
