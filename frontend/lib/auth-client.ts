@@ -12,7 +12,7 @@ function getApiUrl(): string {
                        window.location.hostname === "";
     return isLocalhost 
       ? "http://localhost:8000" 
-      : "https://backend-nine-sigma-81.vercel.app";
+      : "https://todo-nextjs-backend.vercel.app";
   }
   
   // Server-side default (shouldn't happen in auth client, but fallback)
