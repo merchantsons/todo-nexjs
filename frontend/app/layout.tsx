@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: "Evolution of Todo",
   description: "Your personal task management solution",
   icons: {
-    icon: "/logo.png",
+    icon: "/favicon.ico",
   },
 };
 
