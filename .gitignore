@@ -5,6 +5,7 @@
 backend/.env
 frontend/.env.local
 frontend/.env
+Start Server Backend.txt
 
 # Python
 __pycache__/

@@ -40,8 +40,20 @@ try:
             if origin not in origins:
                 origins.append(origin)
     
+    # In production (Vercel), if CORS_ORIGINS is not set or empty, allow all origins
+    # This provides a fallback if environment variable is not configured
+    # Note: In production, it's better to explicitly set CORS_ORIGINS for security
     if not origins:
-        origins = ["*"]  # Fallback to allow all if not set
+        # Check if we're in production (Vercel) by checking for vercel environment
+        is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV")
+        if is_vercel:
+            # In Vercel production, allow all origins as fallback
+            # But log a warning that CORS_ORIGINS should be set
+            print("⚠️ Warning: CORS_ORIGINS not set in production. Allowing all origins.", file=sys.stderr, flush=True)
+            origins = ["*"]
+        else:
+            # In local development, default to localhost
+            origins = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
     
     print(f"✅ CORS origins configured: {origins}", file=sys.stderr, flush=True)
 except Exception as e:

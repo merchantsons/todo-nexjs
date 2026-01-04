@@ -1,1 +1,12 @@
 cd backend; python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+
+BACKEND .env
+CORS_ORIGINS=https://todo-nextjs-frontend-ivory.vercel.app
+BETTER_AUTH_SECRET=0-RJSMXMpGVl3kcFb6_Dkq60uLCVOv508x_641QICwc
+DATABASE_URL=postgresql://default:hslwV0U3ajec@ep-misty-truth-a4fddvwr-pooler.us-east-1.aws.neon.tech/verceldb?sslmode=require&channel_binding=
+
+FRONTEND .env
+NEXT_PUBLIC_API_URL=https://todo-nextjs-backend.vercel.app
+BETTER_AUTH_SECRET=0-RJSMXMpGVl3kcFb6_Dkq60uLCVOv508x_641QICwc
+BETTER_AUTH_URL=https://todo-nextjs-frontend-ivory.vercel.app
