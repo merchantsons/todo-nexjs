@@ -2,18 +2,21 @@ import { authClient } from "./auth-client";
 
 function getApiUrl(): string {
   // First check environment variable (highest priority)
+  // This is required for Vercel deployment
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // In browser, check if we're on localhost
+  // In browser, check if we're on localhost (for local development only)
   if (typeof window !== "undefined") {
     const isLocalhost = window.location.hostname === "localhost" || 
                        window.location.hostname === "127.0.0.1" ||
                        window.location.hostname === "";
-    return isLocalhost 
-      ? "http://localhost:8000" 
-      : "https://todo-nextjs-backend.vercel.app";
+    if (isLocalhost) {
+      return "http://localhost:8000";
+    }
+    // In production, NEXT_PUBLIC_API_URL should be set
+    console.warn("NEXT_PUBLIC_API_URL is not set. Please configure it in Vercel environment variables.");
   }
   
   // Server-side default (shouldn't happen in api client, but fallback)
