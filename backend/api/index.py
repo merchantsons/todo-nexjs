@@ -64,6 +64,8 @@ if _original_handler is None:
 # Wrap handler with additional error handling for runtime errors
 def wrapped_handler(event, context):
     """Wrapper that catches runtime errors and returns proper error responses"""
+    import asyncio
+    
     try:
         # Log request info for debugging
         if event:
@@ -71,20 +73,38 @@ def wrapped_handler(event, context):
             method = event.get("httpMethod", "unknown")
             print(f"📥 Request: {method} {path}", file=sys.stderr, flush=True)
         
-        # Call the original handler (Mangum handles async internally)
-        result = _original_handler(event, context)
+        # Call the original handler
+        # Mangum's handler is async and returns a coroutine, but error handlers are sync
+        handler_result = _original_handler(event, context)
         
-        # Handle if result is a coroutine (shouldn't happen with Mangum, but just in case)
-        if hasattr(result, '__await__'):
-            import asyncio
+        # Check if it's a coroutine (async) or already a result (sync)
+        if hasattr(handler_result, '__await__'):
+            # It's a coroutine, need to await it
+            # Check if we're already in an event loop
             try:
-                # Try to get existing event loop
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
+                # We're in a running loop, which shouldn't happen in Vercel but handle it
+                print("⚠️ Already in running event loop, using ThreadPoolExecutor", file=sys.stderr, flush=True)
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(asyncio.run, handler_result)
+                    result = future.result(timeout=30)  # 30 second timeout
             except RuntimeError:
-                # Create new event loop if none exists
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            result = loop.run_until_complete(result)
+                # No running loop, we can use asyncio.run()
+                try:
+                    result = asyncio.run(handler_result)
+                except Exception as run_error:
+                    # Fallback: create new event loop manually
+                    print(f"⚠️ asyncio.run() failed: {run_error}, trying manual loop", file=sys.stderr, flush=True)
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    try:
+                        result = loop.run_until_complete(handler_result)
+                    finally:
+                        loop.close()
+        else:
+            # It's already a result (synchronous handler like error_handler)
+            result = handler_result
         
         # Ensure result is in correct format
         if isinstance(result, dict):
