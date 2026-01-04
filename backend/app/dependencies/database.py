@@ -13,12 +13,18 @@ def get_engine():
         # Priority: environment variable > .env file > empty string
         # os.getenv() checks actual environment variables (takes precedence)
         # settings.database_url reads from .env file if env var not set
-        db_url = os.getenv("DATABASE_URL") or settings.database_url
+        try:
+            db_url = os.getenv("DATABASE_URL") or (settings.database_url if settings else "")
+        except Exception as e:
+            print(f"⚠️ Error reading settings: {e}", file=sys.stderr, flush=True)
+            db_url = os.getenv("DATABASE_URL", "")
+        
         if not db_url:
             error_msg = "DATABASE_URL environment variable is not set"
             print(f"❌ {error_msg}", file=sys.stderr, flush=True)
             print(f"   Checked os.getenv('DATABASE_URL'): {os.getenv('DATABASE_URL')}", file=sys.stderr, flush=True)
-            print(f"   Checked settings.database_url: {settings.database_url}", file=sys.stderr, flush=True)
+            if settings:
+                print(f"   Checked settings.database_url: {settings.database_url}", file=sys.stderr, flush=True)
             raise ValueError(error_msg)
         
         # Enforce PostgreSQL only - no SQLite support

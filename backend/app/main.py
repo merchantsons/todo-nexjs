@@ -15,8 +15,12 @@ try:
     from app.config import settings
     cors_origins_str = os.getenv("CORS_ORIGINS") or settings.cors_origins or "http://localhost:3000"
     
+    # Remove trailing slashes from origins
+    if cors_origins_str:
+        cors_origins_str = cors_origins_str.rstrip("/")
+    
     # Split and clean origins
-    origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+    origins = [origin.strip().rstrip("/") for origin in cors_origins_str.split(",") if origin.strip()]
     
     # For local development, be more permissive - allow all localhost ports
     # This helps when frontend runs on different ports (3000, 3001, etc.)
