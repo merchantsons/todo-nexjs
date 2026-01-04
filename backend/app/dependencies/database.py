@@ -9,12 +9,23 @@ _engine = None
 def get_engine():
     global _engine
     if _engine is None:
-        # Get DATABASE_URL from environment directly (Vercel provides this)
-        db_url = os.getenv("DATABASE_URL", "") or settings.database_url
+        # Get DATABASE_URL from settings (which reads from .env file or environment variables)
+        # Priority: environment variable > .env file > empty string
+        # os.getenv() checks actual environment variables (takes precedence)
+        # settings.database_url reads from .env file if env var not set
+        db_url = os.getenv("DATABASE_URL") or settings.database_url
         if not db_url:
             error_msg = "DATABASE_URL environment variable is not set"
             print(f"❌ {error_msg}", file=sys.stderr, flush=True)
+            print(f"   Checked os.getenv('DATABASE_URL'): {os.getenv('DATABASE_URL')}", file=sys.stderr, flush=True)
+            print(f"   Checked settings.database_url: {settings.database_url}", file=sys.stderr, flush=True)
             raise ValueError(error_msg)
+        
+        # Enforce PostgreSQL only - no SQLite support
+        if not db_url.startswith(("postgresql://", "postgres://")):
+            error_msg = f"Only PostgreSQL databases are supported. Current DATABASE_URL starts with: {db_url[:20]}..."
+            print(f"❌ {error_msg}", file=sys.stderr, flush=True)
+            raise ValueError("DATABASE_URL must be a PostgreSQL connection string (postgresql://...)")
         
         try:
             # For serverless, use connection pooling with appropriate settings
@@ -29,8 +40,8 @@ def get_engine():
                 pool_recycle=300,  # Recycle connections after 5 minutes
                 connect_args={
                     "connect_timeout": 10,  # 10 second connection timeout
-                    "sslmode": "require" if "postgres" in db_url.lower() else None
-                } if "postgres" in db_url.lower() else {}
+                    "sslmode": "require"
+                }
             )
             print("✅ Database engine created", file=sys.stderr, flush=True)
         except Exception as e:
@@ -41,14 +52,31 @@ def get_engine():
     return _engine
 
 def get_db_session():
-    """Get database session with error handling"""
+    """Get database session with error handling for PostgreSQL database
+    
+    Routes should explicitly call session.commit() to save changes.
+    This function ensures proper rollback on errors and session cleanup.
+    """
+    engine = get_engine()
+    session = Session(engine)
     try:
-        engine = get_engine()
-        with Session(engine) as session:
-            yield session
+        yield session
     except Exception as e:
+        # Rollback on any error to ensure data consistency
+        try:
+            session.rollback()
+        except Exception:
+            pass  # Ignore rollback errors if session is already closed
         error_msg = f"Database session error: {str(e)}"
         print(f"❌ {error_msg}", file=sys.stderr, flush=True)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         # Re-raise to let FastAPI handle it properly
         raise
+    finally:
+        # Always close the session to release connection back to pool
+        try:
+            session.close()
+        except Exception:
+            pass  # Ignore close errors
 

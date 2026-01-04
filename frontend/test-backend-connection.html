@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend Connection</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            const API_URL = 'http://localhost:8000';
+            
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch(`${API_URL}/api/health`);
+                const healthData = await healthResponse.json();
+                
+                resultDiv.innerHTML = `
+                    <h2>✅ Health Check Passed</h2>
+                    <pre>${JSON.stringify(healthData, null, 2)}</pre>
+                    <h3>Testing Register Endpoint...</h3>
+                `;
+                
+                // Test register endpoint
+                const registerResponse = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test' + Date.now() + '@example.com',
+                        password: 'testpass123'
+                    })
+                });
+                
+                if (registerResponse.ok) {
+                    const registerData = await registerResponse.json();
+                    resultDiv.innerHTML += `
+                        <h2>✅ Register Endpoint Working</h2>
+                        <pre>${JSON.stringify(registerData, null, 2)}</pre>
+                    `;
+                } else {
+                    const errorData = await registerResponse.json().catch(() => ({ error: 'Unknown error' }));
+                    resultDiv.innerHTML += `
+                        <h2>⚠️ Register Endpoint Response</h2>
+                        <p>Status: ${registerResponse.status}</p>
+                        <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h2>❌ Connection Failed</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>API URL:</strong> ${API_URL}</p>
+                    <p>Make sure the backend is running on http://localhost:8000</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+

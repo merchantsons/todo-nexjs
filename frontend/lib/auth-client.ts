@@ -2,7 +2,9 @@
 function getApiUrl(): string {
   // First check environment variable (highest priority)
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    const url = process.env.NEXT_PUBLIC_API_URL;
+    console.log("Using API URL from env:", url);
+    return url;
   }
   
   // In browser, check if we're on localhost
@@ -10,13 +12,17 @@ function getApiUrl(): string {
     const isLocalhost = window.location.hostname === "localhost" || 
                        window.location.hostname === "127.0.0.1" ||
                        window.location.hostname === "";
-    return isLocalhost 
+    const url = isLocalhost 
       ? "http://localhost:8000" 
       : "https://todo-nextjs-backend.vercel.app";
+    console.log("Using API URL (browser):", url);
+    return url;
   }
   
   // Server-side default (shouldn't happen in auth client, but fallback)
-  return "http://localhost:8000";
+  const url = "http://localhost:8000";
+  console.log("Using API URL (fallback):", url);
+  return url;
 }
 
 interface User {
@@ -37,19 +43,55 @@ export const authClient = {
     const API_URL = getApiUrl();
     let response: Response;
     try {
+      console.log("Attempting registration to:", `${API_URL}/api/auth/register`);
+      
       response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.email, password: email.password }),
+        credentials: "omit",
       });
 
+      console.log("Registration response status:", response.status);
+      console.log("Registration response headers:", Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: "Registration failed" }));
-        throw new Error(error.detail || "Registration failed");
+        // Try to get response text first to see what we're dealing with
+        const responseText = await response.text();
+        console.error("Registration error response text:", responseText);
+        
+        let error: any;
+        try {
+          error = responseText ? JSON.parse(responseText) : {};
+        } catch (e) {
+          error = { detail: responseText || `Registration failed with status ${response.status}` };
+        }
+        
+        console.error("Registration error response:", error);
+        throw new Error(error.detail || error.message || `Registration failed with status ${response.status}`);
       }
     } catch (err: any) {
+      // Log the actual error for debugging
+      console.error("Backend connection error (signUp):", err);
+      console.error("Error type:", err.constructor.name);
+      console.error("Error message:", err.message);
+      console.error("Error name:", err.name);
+      console.error("API URL attempted:", API_URL);
+      
+      // Handle network errors with better messaging
       if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("NetworkError") || err.name === "TypeError")) {
-        throw new Error(`Cannot connect to backend server at ${API_URL}. Please check if the backend is running and accessible.`);
+        const errorMessage = 
+          `Cannot connect to backend server at ${API_URL}.\n\n` +
+          `Possible causes:\n` +
+          `1. Backend server is not running\n` +
+          `2. CORS configuration issue\n` +
+          `3. Network connectivity problem\n\n` +
+          `To fix:\n` +
+          `- If running locally, start the backend: cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000\n` +
+          `- Check that the backend is accessible at: ${API_URL}/api/health\n` +
+          `- Verify CORS settings in backend allow requests from: ${typeof window !== "undefined" ? window.location.origin : "your frontend URL"}`;
+        
+        throw new Error(errorMessage);
       }
       throw err;
     }
@@ -72,19 +114,47 @@ export const authClient = {
     const API_URL = getApiUrl();
     let response: Response;
     try {
+      console.log("Attempting login to:", `${API_URL}/api/auth/login`);
+      
       response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email: email.email, password: email.password }),
+        // Add credentials for CORS
+        credentials: "omit",
       });
+
+      console.log("Login response status:", response.status);
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ detail: "Login failed" }));
+        console.error("Login error response:", error);
         throw new Error(error.detail || "Login failed");
       }
     } catch (err: any) {
+      // Log the actual error for debugging
+      console.error("Backend connection error (signIn):", err);
+      console.error("Error type:", err.constructor.name);
+      console.error("Error message:", err.message);
+      console.error("Error name:", err.name);
+      console.error("API URL attempted:", API_URL);
+      
+      // Handle network errors with better messaging
       if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("NetworkError") || err.name === "TypeError")) {
-        throw new Error(`Cannot connect to backend server at ${API_URL}. Please check if the backend is running and accessible.`);
+        const errorMessage = 
+          `Cannot connect to backend server at ${API_URL}.\n\n` +
+          `Possible causes:\n` +
+          `1. Backend server is not running\n` +
+          `2. CORS configuration issue\n` +
+          `3. Network connectivity problem\n\n` +
+          `To fix:\n` +
+          `- If running locally, start the backend: cd backend && python -m uvicorn app.main:app --reload --port 8000\n` +
+          `- Check that the backend is accessible at: ${API_URL}/api/health\n` +
+          `- Verify CORS settings in backend allow requests from: ${typeof window !== "undefined" ? window.location.origin : "your frontend URL"}`;
+        
+        throw new Error(errorMessage);
       }
       throw err;
     }

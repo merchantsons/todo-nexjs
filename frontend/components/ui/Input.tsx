@@ -35,7 +35,16 @@ export default function Input({
   
   const inputId = `input-${label.toLowerCase().replace(/\s+/g, '-')}`;
   
-  const baseInputStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 transition-colors";
+  // Calculate approximate label width for placeholder offset
+  // Estimate: ~0.5rem per character for small/base text
+  // Base padding is 0.75rem (px-3) on mobile, 1rem (px-4) on sm+
+  const labelText = `${label} ${required ? '*' : ''}`;
+  const basePadding = 0.75; // px-3 = 0.75rem
+  const labelWidth = labelText.length * 0.5; // Approximate width in rem
+  const gap = 0.5; // Gap between label and placeholder
+  const estimatedLabelWidth = showLabel ? 0 : Math.max(basePadding + labelWidth + gap, 4.5); // Minimum 4.5rem total
+  
+  const baseInputStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base text-black border rounded-lg focus:outline-none focus:ring-2 transition-colors";
   const normalStyles = "border-gray-300 focus:ring-blue-500 focus:border-blue-500";
   const errorStyles = "border-red-500 focus:ring-red-500 focus:border-red-500";
   const inputStyles = error ? errorStyles : normalStyles;
@@ -65,6 +74,9 @@ export default function Input({
           disabled={disabled}
           maxLength={maxLength}
           required={required}
+          style={placeholder && !showLabel ? { 
+            paddingLeft: `${estimatedLabelWidth}rem` 
+          } : undefined}
           className={`${baseInputStyles} ${inputStyles} ${hasValue || focused ? "pt-5 sm:pt-6 pb-2" : "pt-2.5 sm:pt-3 pb-2"} ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
         />
         

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { apiRequest } from '@/lib/api-client';
 import TaskCard from './TaskCard';
@@ -31,7 +31,7 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
   const [error, setError] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (!user) return;
     
     setLoading(true);
@@ -39,17 +39,33 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
     try {
       const response = await apiRequest(`/api/${user.id}/tasks`);
       const data = await response.json();
-      setTasks(data);
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else if (data && Array.isArray(data.tasks)) {
+        // Handle case where API returns { tasks: [...] }
+        setTasks(data.tasks);
+      } else if (data && typeof data === 'object' && 'detail' in data) {
+        // Handle error response from API
+        throw new Error(data.detail || "Unable to load tasks");
+      } else {
+        // Fallback: set empty array if data format is unexpected
+        console.warn("Unexpected tasks data format:", data);
+        setTasks([]);
+      }
     } catch (err: any) {
+      console.error("Error fetching tasks:", err);
       setError(err.message || "Unable to load tasks");
+      setTasks([]); // Ensure tasks is always an array even on error
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
   
   useEffect(() => {
     fetchTasks();
-  }, [user]);
+  }, [fetchTasks]);
   
   const handleToggleComplete = async (id: number, completed: boolean) => {
     if (!user) return;
@@ -101,7 +117,10 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
     );
   }
   
-  if (tasks.length === 0) {
+  // Ensure tasks is always an array before rendering
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+
+  if (safeTasks.length === 0) {
     return (
       <>
         <div className="mb-6">
@@ -118,7 +137,7 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
       </>
     );
   }
-  
+
   return (
     <>
       <div className="mb-6">
@@ -128,7 +147,7 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
       </div>
       
       <div className="space-y-4">
-        {tasks.map((task) => (
+        {safeTasks.map((task) => (
           <div key={task.id} className="group">
             <TaskCard
               task={task}
@@ -153,5 +172,7 @@ export default function TaskList({ onCreateTask }: TaskListProps) {
     </>
   );
 }
+
+
 
 

@@ -14,3 +14,5 @@ def test_health_check(client):
     assert data["version"] == "1.0.0"
 
 
+
+

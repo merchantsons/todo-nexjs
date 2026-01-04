@@ -32,7 +32,7 @@ export default function Textarea({
   
   const textareaId = `textarea-${label.toLowerCase().replace(/\s+/g, '-')}`;
   
-  const baseStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 transition-colors resize-vertical";
+  const baseStyles = "w-full px-3 sm:px-4 py-2 text-sm sm:text-base text-black border rounded-lg focus:outline-none focus:ring-2 transition-colors resize-vertical";
   const normalStyles = "border-gray-300 focus:ring-blue-500 focus:border-blue-500";
   const errorStyles = "border-red-500 focus:ring-red-500 focus:border-red-500";
   const textareaStyles = error ? errorStyles : normalStyles;

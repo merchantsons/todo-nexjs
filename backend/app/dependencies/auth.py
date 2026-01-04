@@ -3,9 +3,22 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 import os
 
-# Read secret directly from environment (Vercel provides this)
+# Read secret from environment or settings
 def get_auth_secret():
-    return os.getenv("BETTER_AUTH_SECRET") or ""
+    # Try environment variable first (for Vercel)
+    secret = os.getenv("BETTER_AUTH_SECRET")
+    if secret:
+        return secret
+    
+    # Fall back to settings (reads from .env file)
+    try:
+        from app.config import settings
+        if settings.better_auth_secret:
+            return settings.better_auth_secret
+    except Exception:
+        pass
+    
+    return ""
 
 security = HTTPBearer()
 

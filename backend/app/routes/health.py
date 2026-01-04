@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from datetime import datetime
-import os
+from app.config import settings
 
 router = APIRouter()
 
@@ -8,10 +8,10 @@ router = APIRouter()
 async def health_check():
     """Health check endpoint that doesn't require database connection"""
     try:
-        # Check if environment variables are set (without accessing database)
-        db_url_set = bool(os.getenv("DATABASE_URL"))
-        secret_set = bool(os.getenv("BETTER_AUTH_SECRET"))
-        cors_set = bool(os.getenv("CORS_ORIGINS"))
+        # Check if environment variables are set (using settings which reads from .env or env vars)
+        db_url_set = bool(settings.database_url)
+        secret_set = bool(settings.better_auth_secret)
+        cors_set = bool(settings.cors_origins)
         
         return {
             "status": "healthy",
