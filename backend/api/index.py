@@ -19,7 +19,7 @@ try:
     # Create Mangum handler for Vercel
     # Mangum converts ASGI (FastAPI) to AWS Lambda format (which Vercel uses)
     # Use lifespan="off" to avoid issues with startup/shutdown events
-    _original_handler = Mangum(app, lifespan="off", log_level="info")
+    _original_handler = Mangum(app, lifespan="off")
     print("✅ Mangum handler created", file=sys.stderr, flush=True)
     
 except Exception as e:

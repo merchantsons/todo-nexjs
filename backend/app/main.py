@@ -11,9 +11,19 @@ app = FastAPI(title="Evolution of Todo API", version="1.0.0")
 # TASK-013: CORS Configuration - MUST be configured FIRST
 # Read directly from environment (Vercel provides these)
 try:
-    # First try to get from settings (reads from .env file)
-    from app.config import settings
-    cors_origins_str = os.getenv("CORS_ORIGINS") or settings.cors_origins or "http://localhost:3000"
+    # Check if we're in Vercel production
+    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV")
+    
+    # First try to get from environment variable (Vercel provides these)
+    cors_origins_str = os.getenv("CORS_ORIGINS", "")
+    
+    # If not in env, try settings (reads from .env file for local dev)
+    if not cors_origins_str:
+        try:
+            from app.config import settings
+            cors_origins_str = settings.cors_origins or ""
+        except Exception:
+            cors_origins_str = ""
     
     # Remove trailing slashes from origins
     if cors_origins_str:
@@ -24,9 +34,9 @@ try:
     
     # For local development, be more permissive - allow all localhost ports
     # This helps when frontend runs on different ports (3000, 3001, etc.)
-    is_local_dev = any("localhost" in origin or "127.0.0.1" in origin for origin in origins) or not origins
+    is_local_dev = any("localhost" in origin or "127.0.0.1" in origin for origin in origins) if origins else True
     
-    if is_local_dev and "*" not in origins:
+    if is_local_dev and "*" not in origins and not is_vercel:
         # Add common localhost ports for development
         localhost_origins = [
             "http://localhost:3000",
@@ -44,50 +54,97 @@ try:
     # This provides a fallback if environment variable is not configured
     # Note: In production, it's better to explicitly set CORS_ORIGINS for security
     if not origins:
-        # Check if we're in production (Vercel) by checking for vercel environment
-        is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV")
         if is_vercel:
             # In Vercel production, allow all origins as fallback
             # But log a warning that CORS_ORIGINS should be set
-            print("⚠️ Warning: CORS_ORIGINS not set in production. Allowing all origins.", file=sys.stderr, flush=True)
+            print("⚠️ Warning: CORS_ORIGINS not set in Vercel. Allowing all origins as fallback.", file=sys.stderr, flush=True)
+            print("⚠️ For better security, set CORS_ORIGINS in Vercel environment variables.", file=sys.stderr, flush=True)
             origins = ["*"]
         else:
             # In local development, default to localhost
             origins = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
     
     print(f"✅ CORS origins configured: {origins}", file=sys.stderr, flush=True)
+    print(f"✅ Vercel environment: {is_vercel}", file=sys.stderr, flush=True)
 except Exception as e:
     print(f"Warning: CORS config error: {e}", file=sys.stderr, flush=True)
-    # Default to allow localhost for local development
-    origins = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
-
-try:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],  # Allow all methods including OPTIONS
-        allow_headers=["*"],  # Allow all headers for development
-        expose_headers=["*"],
-        max_age=3600,  # Cache preflight requests for 1 hour
-    )
-    print("✅ CORS middleware added", file=sys.stderr, flush=True)
-except Exception as e:
-    print(f"Warning: CORS middleware error: {e}", file=sys.stderr, flush=True)
     import traceback
     traceback.print_exc(file=sys.stderr)
+    # Default to allow all origins as fallback
+    origins = ["*"]
+
+try:
+    # Configure CORS middleware
+    # If origins contains "*", we need to handle it specially
+    if "*" in origins:
+        # When using "*", we can't use allow_credentials=True
+        # So we'll allow all origins but handle credentials differently
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],  # Allow all origins
+            allow_credentials=False,  # Must be False when allow_origins=["*"]
+            allow_methods=["*"],  # Allow all methods including OPTIONS
+            allow_headers=["*"],  # Allow all headers
+            expose_headers=["*"],
+            max_age=3600,  # Cache preflight requests for 1 hour
+        )
+        print("✅ CORS middleware added (allow all origins)", file=sys.stderr, flush=True)
+    else:
+        # Specific origins - can use credentials
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],  # Allow all methods including OPTIONS
+            allow_headers=["*"],  # Allow all headers
+            expose_headers=["*"],
+            max_age=3600,  # Cache preflight requests for 1 hour
+        )
+        print("✅ CORS middleware added (specific origins)", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"❌ CORS middleware error: {e}", file=sys.stderr, flush=True)
+    import traceback
+    traceback.print_exc(file=sys.stderr)
+    # Try to add with minimal config as fallback
+    try:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=False,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+        print("✅ CORS middleware added (fallback config)", file=sys.stderr, flush=True)
+    except Exception as fallback_error:
+        print(f"❌ Failed to add CORS middleware even with fallback: {fallback_error}", file=sys.stderr, flush=True)
 
 # Add explicit OPTIONS handler for all routes (backup for CORS preflight)
 @app.options("/{full_path:path}")
 async def options_handler(full_path: str, request: Request):
     """Handle OPTIONS requests for CORS preflight"""
     origin = request.headers.get("origin", "*")
-    allowed_origin = origin if origin in origins else (origins[0] if origins else "*")
+    
+    # Determine allowed origin
+    if "*" in origins:
+        allowed_origin = "*"
+        allow_credentials = "false"
+    else:
+        # Check if origin is in allowed list
+        if origin in origins:
+            allowed_origin = origin
+            allow_credentials = "true"
+        elif origins:
+            allowed_origin = origins[0]  # Use first allowed origin
+            allow_credentials = "true"
+        else:
+            allowed_origin = "*"
+            allow_credentials = "false"
+    
     return JSONResponse(
         content={"message": "OK"},
         headers={
             "Access-Control-Allow-Origin": allowed_origin,
-            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Credentials": allow_credentials,
             "Access-Control-Allow-Methods": "*",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Max-Age": "3600",
@@ -100,7 +157,21 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTPException with CORS headers"""
     import sys
     origin = request.headers.get("origin", "*")
-    allowed_origin = origin if origin in origins else (origins[0] if origins else "*")
+    
+    # Determine allowed origin
+    if "*" in origins:
+        allowed_origin = "*"
+        allow_credentials = "false"
+    else:
+        if origin in origins:
+            allowed_origin = origin
+            allow_credentials = "true"
+        elif origins:
+            allowed_origin = origins[0]
+            allow_credentials = "true"
+        else:
+            allowed_origin = "*"
+            allow_credentials = "false"
     
     # Ensure detail is a string
     detail = str(exc.detail) if exc.detail else "An error occurred"
@@ -112,7 +183,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content={"detail": detail},
         headers={
             "Access-Control-Allow-Origin": allowed_origin,
-            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Credentials": allow_credentials,
             "Access-Control-Allow-Methods": "*",
             "Access-Control-Allow-Headers": "*",
         }
@@ -123,14 +194,28 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors with CORS headers"""
     origin = request.headers.get("origin", "*")
-    allowed_origin = origin if origin in origins else (origins[0] if origins else "*")
+    
+    # Determine allowed origin
+    if "*" in origins:
+        allowed_origin = "*"
+        allow_credentials = "false"
+    else:
+        if origin in origins:
+            allowed_origin = origin
+            allow_credentials = "true"
+        elif origins:
+            allowed_origin = origins[0]
+            allow_credentials = "true"
+        else:
+            allowed_origin = "*"
+            allow_credentials = "false"
     
     return JSONResponse(
         status_code=422,
         content={"detail": exc.errors()},
         headers={
             "Access-Control-Allow-Origin": allowed_origin,
-            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Credentials": allow_credentials,
             "Access-Control-Allow-Methods": "*",
             "Access-Control-Allow-Headers": "*",
         }
@@ -147,7 +232,21 @@ async def global_exception_handler(request: Request, exc: Exception):
     
     # Get origin from request for CORS
     origin = request.headers.get("origin", "*")
-    allowed_origin = origin if origin in origins else (origins[0] if origins else "*")
+    
+    # Determine allowed origin
+    if "*" in origins:
+        allowed_origin = "*"
+        allow_credentials = "false"
+    else:
+        if origin in origins:
+            allowed_origin = origin
+            allow_credentials = "true"
+        elif origins:
+            allowed_origin = origins[0]
+            allow_credentials = "true"
+        else:
+            allowed_origin = "*"
+            allow_credentials = "false"
     
     return JSONResponse(
         status_code=500,
@@ -158,11 +257,26 @@ async def global_exception_handler(request: Request, exc: Exception):
         },
         headers={
             "Access-Control-Allow-Origin": allowed_origin,
-            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Credentials": allow_credentials,
             "Access-Control-Allow-Methods": "*",
             "Access-Control-Allow-Headers": "*",
         }
     )
+
+# Root endpoint for quick health check
+@app.get("/")
+async def root():
+    """Root endpoint - quick health check"""
+    return {
+        "message": "Evolution of Todo API",
+        "version": "1.0.0",
+        "status": "running",
+        "endpoints": {
+            "health": "/api/health",
+            "register": "/api/auth/register",
+            "login": "/api/auth/login"
+        }
+    }
 
 # Include routers - health check first (doesn't need database)
 try:
